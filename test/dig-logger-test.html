@@ -46,8 +46,50 @@ limitations under the License.
       });
     });
 
-    test('', function() {
-      assert.equal();
+    test('_setThisLogBody as an observer works properly', function() {
+      element._esLogList = {
+        version: 'DIG_VERSION',
+        user: 'user',
+        type: 'defaultType',
+        host: window.location.origin,
+        date: new Date(),
+        data: 'some data here'
+      }
+
+      flush(function(done) {
+        assert.equal(element._esLogBody.version, 'DIG_VERSION');
+        assert.equal(element._esLogBody.user, 'user');
+        assert.equal(element._esLogBody.type, 'defaultType');
+        assert.equal(element._esLogBody.data, 'some data here');
+        done();
+      });
+    });
+
+    test('log populates esLogBody correctly', function() {
+      element.log('user', 'defaultType', 'some data here');
+
+      assert.equal(element._esLogBody.version, 'DIG_VERSION');
+      assert.equal(element._esLogBody.user, 'user');
+      assert.equal(element._esLogBody.type, 'defaultType');
+      assert.equal(element._esLogBody.data, 'some data here');
+    });
+
+    test('_logData populates esLogBody correctly', function() {
+      element._logData('user', 'defaultType', 'some data here');
+
+      assert.equal(element._esLogBody.version, 'DIG_VERSION');
+      assert.equal(element._esLogBody.user, 'user');
+      assert.equal(element._esLogBody.type, 'defaultType');
+      assert.equal(element._esLogBody.data, 'some data here');
+    });
+
+    test('_logPageView populates esLogBody correctly', function() {
+      element.logPageView = true;
+      element._logPageView('user');
+
+      assert.equal(element._esLogBody.version, 'DIG_VERSION');
+      assert.equal(element._esLogBody.user, 'user');
+      assert.equal(element._esLogBody.type, 'PageView');
     });
   });
 </script>
