@@ -51,28 +51,70 @@ A Polymer Element that creates string log messages from object collections.
     Polymer({
       is: 'dig-logger',
 
-      properties: {
+      properties: { 
+        /**
+         * (Required)
+         *
+         * The data contained inside the log.
+         *
+         * @type {String}
+         */
         data: {
           type: String
         },
 
+        /**
+         * (Required)
+         *
+         * An instance of elasticsearch.Client which is connected to an elasticsearch server.
+         *
+         * @type {Object}
+         */
         esClient: {
           type: Object
         },
 
+        /**
+         * (Required)
+         *
+         * The elastic index (database name).
+         *
+         * @type {String}
+         */
         esIndex: {
           type: String
         },
 
+        /**
+         * (Required)
+         *
+         * The type of the elasticsearch record to create.
+         *
+         * @type {String}
+         */
         esType: {
           type: String
         },
 
+        /**
+         * (Optional)
+         *
+         * Whether or not to generate a log for pageViews.
+         *
+         * @type {Boolean}
+         */
         logPageView: {
           type: Boolean,
           value: false
         },
 
+        /**
+         * (Optional)
+         *
+         * The logger for 
+         *
+         * @type {Object}
+         */
         logger: {
           notify: true,
           type: Object,
@@ -80,24 +122,48 @@ A Polymer Element that creates string log messages from object collections.
             var self = this;
             return {
               log: function(type, data) {
-                self.log(self.username, 'event', type, data);
+                self.log(self.username, type, data);
               }
             };
           }
         },
 
+        /**
+         * (Required)
+         *
+         * The type of the log record to create.
+         *
+         * @type {String}
+         */
         type: {
           type: String
         },
 
+        /**
+         * (Required)
+         *
+         * The username associated with the log.
+         *
+         * @type {String}
+         */
         username: {
           type: String,
         },
 
+        /**
+         * The log object itself.
+         *
+         * @type {Object}
+         */
         _esLogBody: {
           type: Object
         },
 
+        /**
+         * The list of attributes in the log.
+         *
+         * @type {Array}
+         */
         _esLogList: {
           type: Array,
           value: function() {
@@ -105,6 +171,12 @@ A Polymer Element that creates string log messages from object collections.
           }
         },
 
+        /**
+         *
+         * Result after a successful create including document _id.
+         *
+         * @type {Object}
+         */
         _esLogResult: {
           type: Object
         }
@@ -117,6 +189,11 @@ A Polymer Element that creates string log messages from object collections.
         '_setThisLogBody(_esLogList.splices)'
       ],
 
+      /**
+       * generates a LogList
+       *
+       * @return {array}
+       */
       log: function(username, type, data) {
         this.push('_esLogList', {
           version: 'DIG_VERSION',
@@ -128,16 +205,31 @@ A Polymer Element that creates string log messages from object collections.
         });
       },
 
+      /**
+       * logs the data.
+       *
+       * @private
+       */
       _logData: function(username, type, data) {
         this.log(username, type, data);
       },
 
+      /**
+       * logs the page view.
+       *
+       * @private
+       */
       _logPageView: function(username) {
         if(this.logPageView) {
           this.log(username, 'PageView', window.location.pathname + window.location.search);
         }
       },
 
+      /**
+       * sets the next log body.
+       *
+       * @private
+       */
       _setNextLogBody: function() {
         if(this._esLogList.length) {
           this.set('_esLogBody', this._esLogList.shift());
@@ -145,7 +237,12 @@ A Polymer Element that creates string log messages from object collections.
           this.set('_esLogBody', undefined);
         }
       },
-
+      
+      /**
+       * sets this log body.
+       *
+       * @private
+       */
       _setThisLogBody: function() {
         if(!this._esLogBody) {
           this._setNextLogBody();
