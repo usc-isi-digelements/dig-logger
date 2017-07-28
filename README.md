@@ -1,6 +1,6 @@
 # dig-logger
 
-A Polymer Element that creates string log messages from object collections.
+A Polymer Element that logs text messages to an elasticsearch index.
 
 ### Example
 ```html
