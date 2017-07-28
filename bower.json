@@ -10,7 +10,7 @@
   ],
   "main": "dig-logger.html",
   "license": "http://polymer.github.io/LICENSE.txt",
-  "homepage": "https://github.com/DigElements/log-creator/",
+  "homepage": "https://github.com/DigElements/dig-logger/",
   "ignore": [
     "/.*",
     "/test/"
