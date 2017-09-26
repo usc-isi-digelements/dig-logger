@@ -41,55 +41,178 @@ limitations under the License.
 
     setup(function(done) {
       element = fixture('dig-logger-fixture');
+      flush(done);
+    });
+
+    test('properties are set as expected', function() {
+      assert.isFalse(element.logPageView);
+      assert.isUndefined(element._esLogBody);
+      assert.deepEqual(element._esLogList, []);
+      assert.isNull(element._esLogResult);
+      assert.isObject(element.logger);
+      assert.isFunction(element.logger.log);
+    });
+
+    test('log does set _esLogBody', function(done) {
+      element.log('testUser', 'testType', 'testData');
+
       flush(function() {
+        assert.isObject(element._esLogBody);
+        assert.equal(element._esLogBody.version, 'DIG_VERSION');
+        assert.equal(element._esLogBody.user, 'testUser');
+        assert.equal(element._esLogBody.type, 'testType');
+        assert.equal(element._esLogBody.data, 'testData');
+        assert.isString(element._esLogBody.host);
+        assert.typeOf(element._esLogBody.date, 'date');
         done();
       });
     });
 
-    test('_setThisLogBody as an observer works properly', function() {
-      element._esLogList = {
+    test('_logData does set _esLogBody', function(done) {
+      element._logData('testUser', 'testType', 'testData');
+
+      flush(function() {
+        assert.isObject(element._esLogBody);
+        assert.equal(element._esLogBody.version, 'DIG_VERSION');
+        assert.equal(element._esLogBody.user, 'testUser');
+        assert.equal(element._esLogBody.type, 'testType');
+        assert.equal(element._esLogBody.data, 'testData');
+        assert.isString(element._esLogBody.host);
+        assert.typeOf(element._esLogBody.date, 'date');
+        done();
+      });
+    });
+
+    test('_logPageView does set _esLogBody', function(done) {
+      element.logPageView = true;
+      element._logPageView('testUser');
+
+      flush(function() {
+        assert.isObject(element._esLogBody);
+        assert.equal(element._esLogBody.version, 'DIG_VERSION');
+        assert.equal(element._esLogBody.user, 'testUser');
+        assert.equal(element._esLogBody.type, 'PageView');
+        assert.isString(element._esLogBody.data);
+        assert.isString(element._esLogBody.host);
+        assert.typeOf(element._esLogBody.date, 'date');
+        done();
+      });
+    });
+
+    test('setting username does set _esLogBody if logPageView is true', function(done) {
+      element.logPageView = true;
+      element.username = 'testUser';
+
+      flush(function() {
+        assert.isObject(element._esLogBody);
+        assert.equal(element._esLogBody.version, 'DIG_VERSION');
+        assert.equal(element._esLogBody.user, 'testUser');
+        assert.equal(element._esLogBody.type, 'PageView');
+        assert.isString(element._esLogBody.data);
+        assert.isString(element._esLogBody.host);
+        assert.typeOf(element._esLogBody.date, 'date');
+        done();
+      });
+    });
+
+    test('setting username does not set _esLogBody if logPageView is false', function(done) {
+      element.username = 'testUser';
+
+      flush(function() {
+        assert.isUndefined(element._esLogBody);
+        done();
+      });
+    });
+
+    test('adding to _esLogList does set _esLogBody if it is undefined', function(done) {
+      element.push('_esLogList', {
         version: 'DIG_VERSION',
-        user: 'user',
-        type: 'defaultType',
+        user: 'testUser',
+        type: 'testType',
         host: window.location.origin,
         date: new Date(),
-        data: 'some data here'
-      }
+        data: 'testData'
+      });
 
-      flush(function(done) {
+      flush(function() {
+        assert.isObject(element._esLogBody);
         assert.equal(element._esLogBody.version, 'DIG_VERSION');
-        assert.equal(element._esLogBody.user, 'user');
-        assert.equal(element._esLogBody.type, 'defaultType');
-        assert.equal(element._esLogBody.data, 'some data here');
+        assert.equal(element._esLogBody.user, 'testUser');
+        assert.equal(element._esLogBody.type, 'testType');
+        assert.equal(element._esLogBody.data, 'testData');
+        assert.isString(element._esLogBody.host);
+        assert.typeOf(element._esLogBody.date, 'date');
         done();
       });
     });
 
-    test('log populates esLogBody correctly', function() {
-      element.log('user', 'defaultType', 'some data here');
+    test('adding to _esLogList does not set _esLogBody if it is defined', function(done) {
+      element._esLogBody = 'testBody';
+      element._esLogList.push('nextTestBody');
 
-      assert.equal(element._esLogBody.version, 'DIG_VERSION');
-      assert.equal(element._esLogBody.user, 'user');
-      assert.equal(element._esLogBody.type, 'defaultType');
-      assert.equal(element._esLogBody.data, 'some data here');
+      flush(function() {
+        assert.equal(element._esLogBody, 'testBody');
+        assert.deepEqual(element._esLogList, ['nextTestBody']);
+        done();
+      });
     });
 
-    test('_logData populates esLogBody correctly', function() {
-      element._logData('user', 'defaultType', 'some data here');
+    test('setting _esLogResult does set _esLogBody to undefined if _esLogList is empty', function(done) {
+      element._esLogBody = 'testBody';
+      element._esLogResult = 'testResult';
 
-      assert.equal(element._esLogBody.version, 'DIG_VERSION');
-      assert.equal(element._esLogBody.user, 'user');
-      assert.equal(element._esLogBody.type, 'defaultType');
-      assert.equal(element._esLogBody.data, 'some data here');
+      flush(function() {
+        assert.isUndefined(element._esLogBody);
+        done();
+      });
     });
 
-    test('_logPageView populates esLogBody correctly', function() {
-      element.logPageView = true;
-      element._logPageView('user');
+    test('setting _esLogResult does set _esLogBody to the next item in _esLogList', function(done) {
+      element._esLogBody = 'testBody';
+      element._esLogList = ['nextTestBody'];
+      element._esLogResult = 'testResult';
 
-      assert.equal(element._esLogBody.version, 'DIG_VERSION');
-      assert.equal(element._esLogBody.user, 'user');
-      assert.equal(element._esLogBody.type, 'PageView');
+      flush(function() {
+        assert.equal(element._esLogBody, 'nextTestBody');
+        assert.deepEqual(element._esLogList, []);
+        done();
+      });
+    });
+
+    test('setting username, type, and data does set _esLogBody if it is undefined', function(done) {
+      element.username = 'testUser';
+      element.type = 'testType';
+      element.data = 'testData';
+
+      flush(function() {
+        assert.isObject(element._esLogBody);
+        assert.equal(element._esLogBody.version, 'DIG_VERSION');
+        assert.equal(element._esLogBody.user, 'testUser');
+        assert.equal(element._esLogBody.type, 'testType');
+        assert.equal(element._esLogBody.data, 'testData');
+        assert.isString(element._esLogBody.host);
+        assert.typeOf(element._esLogBody.date, 'date');
+        done();
+      });
+    });
+
+    test('setting username, type, and data does not set _esLogBody if it is defined', function(done) {
+      element._esLogBody = 'testBody';
+      element.username = 'testUser';
+      element.type = 'testType';
+      element.data = 'testData';
+
+      flush(function() {
+        assert.equal(element._esLogBody, 'testBody');
+        assert.equal(element._esLogList.length, 1);
+        assert.equal(element._esLogList[0].version, 'DIG_VERSION');
+        assert.equal(element._esLogList[0].user, 'testUser');
+        assert.equal(element._esLogList[0].type, 'testType');
+        assert.equal(element._esLogList[0].data, 'testData');
+        assert.isString(element._esLogList[0].host);
+        assert.typeOf(element._esLogList[0].date, 'date');
+        done();
+      });
     });
   });
 </script>

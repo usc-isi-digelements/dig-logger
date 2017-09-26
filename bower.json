@@ -1,7 +1,7 @@
 {
   "name": "dig-logger",
   "description": "A Polymer Element that logs text messages to an elasticsearch index.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "authors": ["Next Century Corporation"],
   "license": "Apache-2.0",
   "keywords": [
@@ -9,7 +9,6 @@
     "polymer"
   ],
   "main": "dig-logger.html",
-  "license": "http://polymer.github.io/LICENSE.txt",
   "homepage": "https://github.com/DigElements/dig-logger/",
   "ignore": [
     "/.*",
@@ -17,7 +16,7 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.2",
-    "elastic-create": "DigElements/elastic-create#~2.0.1"
+    "elastic-create": "DigElements/elastic-create#2.0.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^2.0.0",

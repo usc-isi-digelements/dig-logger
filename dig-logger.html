@@ -200,7 +200,7 @@ A Polymer Element that logs text messages to an elasticsearch index.
         if(!username || !type || !data) {
           return;
         }
-        this._esLogList.push({
+        this.push('_esLogList', {
           version: 'DIG_VERSION',
           user: username,
           type: type || '',
